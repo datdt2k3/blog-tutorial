@@ -7,19 +7,28 @@ import {
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import { useDispatch } from "react-redux";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { getPost } from "../redux/slice/postSlice";
+import { debounce } from "../utils/debounce";
 const SearchForm = () => {
   const [keyword, setKeyword] = useState("");
   const dispatch = useDispatch();
 
   const handleChange = (e) => {
     setKeyword(e.target.value);
+    requestSearch(e.target.value);
   };
 
-  useEffect(() => {
-    dispatch(getPost(keyword));
-  }, [keyword, dispatch]);
+  const requestSearch = useCallback(
+    debounce((keyword) => {
+      dispatch(getPost(keyword));
+    }),
+    []
+  );
+  //   useEffect(() => {
+  //     requestSearch(keyword);
+  //   }, [keyword]);
+
   return (
     <>
       <Box className="App">
