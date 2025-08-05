@@ -19,10 +19,14 @@ const CardItem = ({ id, title }) => {
             component="img"
             height="140"
             image="https://picsum.photos/200"
-            alt="green iguana"
           />
           <CardContent>
-            <Typography gutterBottom variant="p" component="div">
+            <Typography
+              gutterBottom
+              variant="h5"
+              component="div"
+              style={{ minHeight: "60px", fontSize: "18px" }}
+            >
               {title}
             </Typography>
             {/* <Typography variant="body2" sx={{ color: "text.secondary" }}>

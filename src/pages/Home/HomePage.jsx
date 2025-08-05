@@ -7,6 +7,7 @@ import {
 } from "../../redux/slice/postSlice";
 import { useDispatch, useSelector } from "react-redux";
 import CardItem from "../../components/CardItem";
+import SearchForm from "../../components/SearchForm";
 export const HomePage = () => {
   const dispatch = useDispatch();
 
@@ -19,6 +20,7 @@ export const HomePage = () => {
 
   return (
     <>
+      <SearchForm />
       <h1>Home Page</h1>
       <Grid container spacing={2}>
         {postStatus === "loading" ? (

@@ -18,6 +18,10 @@ export const Detail = () => {
   useEffect(() => {
     dispatch(getDetailPost(id));
   }, [dispatch, id]);
+
+  if (postStatus === "failed") {
+    return <p>Failed to load post details.</p>;
+  }
   return (
     <>
       {postStatus === "loading" ? (
@@ -25,6 +29,9 @@ export const Detail = () => {
       ) : (
         <>
           <h1>Detail</h1>
+          <Box sx={{ display: "flex", alignItems: "center", marginBottom: 2 }}>
+            <p>Post by: {post?.user?.username}</p>
+          </Box>
           <Box sx={{ paddingTop: 2 }}>
             <h2>{post.title}</h2>
             <p>{post.body}</p>

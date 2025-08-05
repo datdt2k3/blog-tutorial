@@ -37,8 +37,12 @@ export const postSlice = createSlice({
 // 
 export const getPost = createAsyncThunk(
   "post/getPost",
-  async (_ , { rejectWithValue }) => {
-    const response = await axios.get(`${getEnv("VITE_SERVER_API_URL")}/posts`);
+  async (query = "", { rejectWithValue }) => {
+    let queryString = "";
+    if(query) {
+      queryString = `/search?q=${query}`;
+    }
+    const response = await axios.get(`${getEnv("VITE_SERVER_API_URL")}/posts${queryString}`);
     if (response.status !== 200) {
       return rejectWithValue("Failed to fetch posts");
     }
@@ -56,6 +60,14 @@ export const getDetailPost = createAsyncThunk(
       return rejectWithValue("Failed to fetch post details");
     }
     const data = await response.data;
+
+    const responseDataUser = await axios.get(`${getEnv("VITE_SERVER_API_URL")}/users/${data.userId}`);
+
+    if (responseDataUser.status === 200) {
+      const user = await responseDataUser.data;
+      data.user = user;
+    }
+    
     return data;
   }
 )
