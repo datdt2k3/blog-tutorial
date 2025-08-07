@@ -8,6 +8,8 @@ import {
 } from "../../redux/slice/postSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
+import Loading from "../../components/Loading";
+import { Error } from "../../components/Error";
 export const Detail = () => {
   const dispatch = useDispatch();
   const post = useSelector(selectPostDetail);
@@ -19,13 +21,13 @@ export const Detail = () => {
     dispatch(getDetailPost(id));
   }, [dispatch, id]);
 
-  if (postStatus === "failed") {
-    return <p>Failed to load post details.</p>;
+  if (postStatus === "error") {
+    return <Error />;
   }
   return (
     <>
       {postStatus === "loading" ? (
-        <p>Loading...</p>
+        <Loading />
       ) : (
         <>
           <h1>Detail</h1>

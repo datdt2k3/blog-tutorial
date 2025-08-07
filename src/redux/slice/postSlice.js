@@ -5,8 +5,9 @@ export const postSlice = createSlice({
   name: "post",
   initialState: {
     postList: [],
+    postCount: 0,
     postDetail: {},
-    status: "idle", // idle | loading | succeeded | failed
+    status: "idle", // idle | loading | succeeded | error
   },
   reducers: {},
   extraReducers: (builder) => {
@@ -16,10 +17,11 @@ export const postSlice = createSlice({
       })
       .addCase(getPost.fulfilled, (state, action) => {
         state.status = "idle";
-        state.postList = action.payload;
+        state.postList = action.payload.posts;
+        state.postCount = action.payload.total;
       })
       .addCase(getPost.rejected, (state) => {
-        state.status = "failed";
+        state.status = "error";
       })
       .addCase(getDetailPost.pending, (state) => {
         state.status = "loading";
@@ -29,7 +31,7 @@ export const postSlice = createSlice({
         state.postDetail = action.payload;
       })
       .addCase(getDetailPost.rejected, (state) => {
-        state.status = "failed";
+        state.status = "error";
       });
   }
 });
@@ -37,8 +39,8 @@ export const postSlice = createSlice({
 // 
 export const getPost = createAsyncThunk(
   "post/getPost",
-  async (query = "", { rejectWithValue }) => {
-    let queryString = "";
+  async ({query, skip}, { rejectWithValue }) => {
+    let queryString = `?limit=${getEnv("VITE_LIMIT_POST")}&skip=${skip}`;
     if(query) {
       queryString = `/search?q=${query}`;
     }
@@ -46,7 +48,9 @@ export const getPost = createAsyncThunk(
     if (response.status !== 200) {
       return rejectWithValue("Failed to fetch posts");
     }
-    const data = await response.data.posts;
+    const data = await response.data;
+    console.log(data);
+    
     return data;
   }
 );
@@ -73,5 +77,6 @@ export const getDetailPost = createAsyncThunk(
 )
 
 export const selectPostList = (state) => state.post.postList;
+export const selectPostCount = (state) => state.post.postCount;
 export const selectPostDetail = (state) => state.post.postDetail;
 export const selectPostStatus = (state) => state.post.status;
