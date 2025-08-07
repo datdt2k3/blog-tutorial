@@ -10,24 +10,30 @@ import { useDispatch } from "react-redux";
 import { useCallback, useEffect, useState } from "react";
 import { getPost } from "../redux/slice/postSlice";
 import { debounce } from "../utils/debounce";
+import { useSearchParams } from "react-router-dom";
 const SearchForm = () => {
   const [keyword, setKeyword] = useState("");
   const dispatch = useDispatch();
-
+  const [searchParam, setSearchParam] = useSearchParams();
   const handleChange = (e) => {
-    setKeyword(e.target.value);
-    requestSearch(e.target.value);
+    const value = e.target.value;
+    setKeyword(value);
+    setSearchParam({ keyword: value }); // Reset to first page on new search
   };
 
   const requestSearch = useCallback(
     debounce((keyword) => {
-      dispatch(getPost(keyword));
+      dispatch(getPost({ query: keyword, skip: 0 }));
     }),
     []
   );
-  //   useEffect(() => {
-  //     requestSearch(keyword);
-  //   }, [keyword]);
+  useEffect(() => {
+    requestSearch(keyword);
+
+    if (searchParam.get("keyword")) {
+      setKeyword(searchParam.get("keyword"));
+    }
+  }, [keyword]);
 
   return (
     <>
@@ -44,7 +50,7 @@ const SearchForm = () => {
               width: 350,
               margin: "10px auto",
             }}
-            value={keyword}
+            value={searchParam.get("keyword") ?? keyword}
             onChange={handleChange}
           />
           <IconButton type="submit" aria-label="search">

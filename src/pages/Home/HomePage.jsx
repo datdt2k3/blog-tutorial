@@ -12,11 +12,15 @@ import SearchForm from "../../components/SearchForm";
 import Loading from "../../components/Loading";
 import { Error } from "../../components/Error";
 import { getEnv } from "../../utils/env";
+import { useSearchParams } from "react-router-dom";
 export const HomePage = () => {
   const dispatch = useDispatch();
-
+  const [searchParam, setSearchParam] = useSearchParams();
+  const page = Number(searchParam.get("page") ?? 1); // lấy trang từ tham số tìm kiếm, mặc định là 1
+  const keyword = searchParam.get("keyword") ?? ""; // lấy từ khóa tìm kiếm từ tham số tìm kiếm, mặc định là rỗng
   useEffect(() => {
-    dispatch(getPost({ query: "", skip: 0 }));
+    const skip = (page - 1) * getEnv("VITE_LIMIT_POST"); // tính toán số lượng bài viết bỏ qua dựa trên trang hiện tại
+    dispatch(getPost({ query: keyword, skip }));
   }, [dispatch]);
 
   const postList = useSelector(selectPostList);
@@ -31,6 +35,7 @@ export const HomePage = () => {
     // chuyển đổi trang
     const skip = (value - 1) * getEnv("VITE_LIMIT_POST");
     dispatch(getPost({ query: "", skip }));
+    setSearchParam({ page: value }); // cập nhật tham số tìm kiếm trong URL
     window.scrollTo({ top: 0, behavior: "smooth" }); // cuộn lên đầu trang khi chuyển trang
   };
   return (
@@ -49,7 +54,11 @@ export const HomePage = () => {
         spacing={2}
         sx={{ marginTop: 2, display: "flex", alignItems: "center" }}
       >
-        <Pagination count={pagesCount} onChange={handlePageChange} />
+        <Pagination
+          count={pagesCount}
+          page={page}
+          onChange={handlePageChange}
+        />
       </Stack>
     </>
   );

@@ -49,7 +49,7 @@ export const getPost = createAsyncThunk(
       return rejectWithValue("Failed to fetch posts");
     }
     const data = await response.data;
-    console.log(data);
+    // console.log(data);
     
     return data;
   }
