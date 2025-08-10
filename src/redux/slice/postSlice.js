@@ -40,10 +40,17 @@ export const postSlice = createSlice({
 export const getPost = createAsyncThunk(
   "post/getPost",
   async ({query, skip}, { rejectWithValue }) => {
-    let queryString = `?limit=${getEnv("VITE_LIMIT_POST")}&skip=${skip}`;
-    if(query) {
-      queryString = `/search?q=${query}`;
+    const params = {
+      q: query,
+      limit: getEnv("VITE_LIMIT_POST"),
+      skip,
     }
+    let pathname = "/posts";
+    if (query) {
+      pathname = `/posts/search`;
+    }
+    let queryString = `?${new URLSearchParams(params).toString()}`;
+   
     const response = await axios.get(`${getEnv("VITE_SERVER_API_URL")}/posts${queryString}`);
     if (response.status !== 200) {
       return rejectWithValue("Failed to fetch posts");

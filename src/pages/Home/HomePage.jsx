@@ -34,8 +34,22 @@ export const HomePage = () => {
   const handlePageChange = (_, value) => {
     // chuyển đổi trang
     const skip = (value - 1) * getEnv("VITE_LIMIT_POST");
-    dispatch(getPost({ query: "", skip }));
-    setSearchParam({ page: value }); // cập nhật tham số tìm kiếm trong URL
+    const params = Array.from(searchParam.entries()).reduce(
+      (pre, [key, value]) => {
+        if (!pre[key]) {
+          pre[key] = value; // nếu tham số chưa tồn tại, thêm vào
+        } else {
+          if (!Array.isArray(pre[key])) {
+            pre[key] = [pre[key]]; // nếu tham số đã tồn tại nhưng không phải mảng, chuyển đổi thành mảng
+          }
+          pre[key].push(value); // thêm giá trị mới vào mảng
+        }
+        return pre; // trả về đối tượng tham số đã cập nhật
+      },
+      {}
+    ); // chuyển đổi tham số tìm kiếm thành mảng để dễ dàng kiểm tra
+    dispatch(getPost({ query: keyword, skip }));
+    setSearchParam({ ...params, page: value }); // cập nhật tham số tìm kiếm trong URL
     window.scrollTo({ top: 0, behavior: "smooth" }); // cuộn lên đầu trang khi chuyển trang
   };
   return (
