@@ -7,7 +7,7 @@ import {
   selectPostStatus,
 } from "../../redux/slice/postSlice";
 import { useDispatch, useSelector } from "react-redux";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import Loading from "../../components/Loading";
 import { Error } from "../../components/Error";
 export const Detail = () => {
@@ -15,7 +15,6 @@ export const Detail = () => {
   const post = useSelector(selectPostDetail);
   const postStatus = useSelector(selectPostStatus);
   const { id } = useParams();
-  console.log("Detail Post:", post);
 
   useEffect(() => {
     dispatch(getDetailPost(id));
@@ -32,7 +31,12 @@ export const Detail = () => {
         <>
           <h1>Detail</h1>
           <Box sx={{ display: "flex", alignItems: "center", marginBottom: 2 }}>
-            <p>Post by: {post?.user?.username}</p>
+            <p>
+              Post by:{" "}
+              <Link to={`/author/${post?.user?.id}`}>
+                {post?.user?.username}
+              </Link>
+            </p>
           </Box>
           <Box sx={{ paddingTop: 2 }}>
             <h2>{post.title}</h2>

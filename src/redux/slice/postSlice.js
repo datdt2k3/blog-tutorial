@@ -32,14 +32,26 @@ export const postSlice = createSlice({
       })
       .addCase(getDetailPost.rejected, (state) => {
         state.status = "error";
-      });
+      })
+      // tìm kiếm theo tác giả
+      .addCase(getPostByUser.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(getPostByUser.fulfilled, (state, action) => {
+        state.status = "idle";
+        state.postList = action.payload.posts;
+        state.postCount = action.payload.total;
+      })
+      .addCase(getPostByUser.rejected, (state) => {
+        state.status = "error";
+      })
   }
 });
 
-// 
+// Gọi bài viết
 export const getPost = createAsyncThunk(
   "post/getPost",
-  async ({query, skip}, { rejectWithValue }) => {
+  async ({query = "", skip}, { rejectWithValue }) => {
     const params = {
       q: query,
       limit: getEnv("VITE_LIMIT_POST"),
@@ -56,13 +68,11 @@ export const getPost = createAsyncThunk(
       return rejectWithValue("Failed to fetch posts");
     }
     const data = await response.data;
-    // console.log(data);
-    
     return data;
   }
 );
 
-// Fetch detail post by ID
+// Gọi chi tiêt bài viết
 export const getDetailPost = createAsyncThunk(
   "post/getDetailPost",
   async (id, { rejectWithValue }) => {
@@ -79,6 +89,18 @@ export const getDetailPost = createAsyncThunk(
       data.user = user;
     }
     
+    return data;
+  }
+)
+// tìm kiếm theo tác giả
+export const getPostByUser = createAsyncThunk(
+  "post/getPostByUser",
+  async (id, { rejectWithValue }) => {
+    const response = await axios.get(`${getEnv("VITE_SERVER_API_URL")}/users/${id}/posts`);
+    if (response.status !== 200) {
+      return rejectWithValue("Failed to fetch post details");
+    }
+    const data = await response.data;
     return data;
   }
 )
